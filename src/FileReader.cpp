@@ -4,15 +4,18 @@
 #include <time.h>
 #include "BloomFilter.hpp"
 #include <vector>
+#include <map>
 #include <string>
 #include "RollingHashIterator.h"
 #include "kseq.h"
+
 using namespace std;
 // STEP 1: declare the type of file handler and the read() function
 KSEQ_INIT(gzFile, gzread)
 
 int main(int argc, char *argv[])
 {
+	map<string, uint64_t> map;
     gzFile fp;
     kseq_t *seq;
     int l;
@@ -28,11 +31,16 @@ int main(int argc, char *argv[])
     fp = gzopen(argv[1], "r"); // STEP 2: open the file handler
     seq = kseq_init(fp); // STEP 3: initialize seq
     while ((l = kseq_read(seq)) >= 0) { // STEP 4: read sequence
-    	printf("seq: %s\n", seq->seq.s);
 		RollingHashIterator itr(seq->seq.s, 4, 5);
 		while (itr != itr.end()) {
-			bloom.insert(*itr);
-			cout << itr.kmer() << endl;
+			if(bloom.contains(*itr)) {
+				if(map.find(itr.kmer()) == map.end()) {
+					map.insert(make_pair(itr.kmer(),0));
+				}
+			} else {
+				bloom.insert(*itr);
+			}
+
 			itr++;
 		}
 
