@@ -36,12 +36,13 @@ int main(int argc, char *argv[])
 		while (itr != itr.end()) {
 			if(bloom.contains(*itr)) {
 				if(map.find(itr.kmer()) == map.end()) {
-					map.insert(make_pair(itr.kmer(),0));
+					map.insert(make_pair(itr.kmer(),1));
 				} else {
 					map[itr.kmer()]++;
 				}
 			} else {
 				bloom.insert(*itr);
+				map.insert(make_pair(itr.kmer(),1));
 			}
 
 			itr++;
@@ -52,12 +53,30 @@ int main(int argc, char *argv[])
     for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); ++it) {
     	std::cout << it->first << " => " << it->second << '\n';
     }
+    std::vector<pair<std::string, uint64_t>> keys;
+
+    typedef std::map<string, uint64_t>::iterator iter;
+    iter it = map.begin();
+    iter end2 = map.end();
+
+    uint64_t maxValue = it->second;
+    string maxKey = it->first;
+
+    for( ; it != end2; ++it) {
+        if(it->second > maxValue) {
+        	maxValue = it->second;
+        	maxKey = it->first;
+        }
+    }
+    keys.push_back(std::make_pair(maxKey,maxValue));
+
+    for (auto i = keys.begin(); i != keys.end(); ++i)
+        std::cout << i->first << "->" << i->second << endl;
 
     kseq_destroy(seq); // STEP 5: destroy seq
     gzclose(fp); // STEP 6: close the file handler
 
     time_t end = time(NULL);
     std::cout<<"Execution Time: "<< (double)(end-start)<<" Seconds"<<std::endl;
-    cout << bloom.contains("GGAAT")<<endl;
     return 0;
 }
