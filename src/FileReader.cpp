@@ -5,6 +5,7 @@
 #include "BloomFilter.hpp"
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include "RollingHashIterator.h"
 #include "kseq.h"
@@ -36,6 +37,8 @@ int main(int argc, char *argv[])
 			if(bloom.contains(*itr)) {
 				if(map.find(itr.kmer()) == map.end()) {
 					map.insert(make_pair(itr.kmer(),0));
+				} else {
+					map[itr.kmer()]++;
 				}
 			} else {
 				bloom.insert(*itr);
@@ -45,11 +48,16 @@ int main(int argc, char *argv[])
 		}
 
     }
+
+    for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); ++it) {
+    	std::cout << it->first << " => " << it->second << '\n';
+    }
+
     kseq_destroy(seq); // STEP 5: destroy seq
     gzclose(fp); // STEP 6: close the file handler
 
     time_t end = time(NULL);
     std::cout<<"Execution Time: "<< (double)(end-start)<<" Seconds"<<std::endl;
-    cout << bloom.contains("AATGG")<<endl;
+    cout << bloom.contains("GGAAT")<<endl;
     return 0;
 }
