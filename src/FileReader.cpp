@@ -10,6 +10,7 @@
 #include "RollingHashIterator.h"
 #include "kseq.h"
 
+static inline void PushAndSort(std::vector<pair<std::string, uint64_t>>& vect, string key, uint64_t  value, int size);
 using namespace std;
 // STEP 1: declare the type of file handler and the read() function
 KSEQ_INIT(gzFile, gzread)
@@ -47,28 +48,23 @@ int main(int argc, char *argv[])
 
 			itr++;
 		}
-
     }
 
-    for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); ++it) {
+    for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); it++) {
     	std::cout << it->first << " => " << it->second << '\n';
     }
+
     std::vector<pair<std::string, uint64_t>> keys;
+    for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); it++) {
 
-    typedef std::map<string, uint64_t>::iterator iter;
-    iter it = map.begin();
-    iter end2 = map.end();
-
-    uint64_t maxValue = it->second;
-    string maxKey = it->first;
-
-    for( ; it != end2; ++it) {
-        if(it->second > maxValue) {
-        	maxValue = it->second;
-        	maxKey = it->first;
-        }
+    	if(keys.size() < 5){
+    		PushAndSort(keys, it->first, it->second, 5 );
+    	} else if (keys.back().second < it->second){
+    		PushAndSort(keys, it->first, it->second, 5 );
+    	}else{
+    		continue;
+    	}
     }
-    keys.push_back(std::make_pair(maxKey,maxValue));
 
     for (auto i = keys.begin(); i != keys.end(); ++i)
         std::cout << i->first << "->" << i->second << endl;
@@ -80,3 +76,19 @@ int main(int argc, char *argv[])
     std::cout<<"Execution Time: "<< (double)(end-start)<<" Seconds"<<std::endl;
     return 0;
 }
+
+static inline void PushAndSort(std::vector<pair<std::string, uint64_t>>& vect, string key, uint64_t  value, int size)
+{
+	if(vect.size() == size ){
+		vect.back() = make_pair(key, value);
+	}
+	else{
+		vect.push_back(std::make_pair(key,value));
+	}
+
+	std::sort(vect.begin(), vect.end(), [](const std::pair<std::string, uint64_t> &left, const std::pair<std::string, uint64_t> &right) {
+	    return left.second > right.second;
+	});
+}
+
+
