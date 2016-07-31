@@ -14,5 +14,13 @@ Rolling iterator simply hashes the k-mers while iterating over the k-mers. For s
 I make use of several articles particularly the following one. 
 http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-333
 
+#How To Run
+1 - Go to the project directory. 
+2 - make
+3 - Go to /bin under project directory
+4 - Run by the following command:
+./FileReader <fileName> <kmerSize> <topCount>
+Example usage : ./FileReader /Users/serkan/Downloads/ERR013101_1.fastq 10 25 
+
 
 
