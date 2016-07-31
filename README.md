@@ -22,5 +22,6 @@ http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-12-333
 ./FileReader <fileName> <kmerSize> <topCount>
 Example usage : ./FileReader /Users/serkan/Downloads/ERR013101_1.fastq 10 25 
 
-
+For further questins please dont hesitate to email me 
+serkanbugur@gmail.com
 
