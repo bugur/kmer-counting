@@ -28,12 +28,12 @@ int main(int argc, char *argv[])
 
     time_t start = time(NULL);
 
-    BloomFilter bloom(1000, 4, 5);
+    BloomFilter bloom(1000, 4, atoi(argv[2]));
 
     fp = gzopen(argv[1], "r"); // STEP 2: open the file handler
     seq = kseq_init(fp); // STEP 3: initialize seq
     while ((l = kseq_read(seq)) >= 0) { // STEP 4: read sequence
-		RollingHashIterator itr(seq->seq.s, 4, 5);
+		RollingHashIterator itr(seq->seq.s, 4, atoi(argv[2]));
 		while (itr != itr.end()) {
 			if(bloom.contains(*itr)) {
 				if(map.find(itr.kmer()) == map.end()) {
@@ -50,17 +50,13 @@ int main(int argc, char *argv[])
 		}
     }
 
-    for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); it++) {
-    	std::cout << it->first << " => " << it->second << '\n';
-    }
-
     std::vector<pair<std::string, uint64_t>> keys;
     for(std::map<string, uint64_t>::iterator it=map.begin(); it!= map.end(); it++) {
 
-    	if(keys.size() < 5){
-    		PushAndSort(keys, it->first, it->second, 5 );
+    	if(keys.size() < atoi(argv[3])){
+    		PushAndSort(keys, it->first, it->second, atoi(argv[3]) );
     	} else if (keys.back().second < it->second){
-    		PushAndSort(keys, it->first, it->second, 5 );
+    		PushAndSort(keys, it->first, it->second, atoi(argv[3]) );
     	}else{
     		continue;
     	}
